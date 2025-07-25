@@ -1,1 +1,150 @@
-
+{% extends "base.html" %}
+{% block title %}التقارير والإحصائيات{% endblock %}
+{% block content %}
+<style>
+    .stat-card {
+        border: none;
+        border-radius: 1rem;
+        box-shadow: 0 2px 12px #0001;
+        transition: transform 0.15s;
+        min-height: 170px;
+    }
+    .stat-card:hover {
+        transform: translateY(-5px) scale(1.03);
+        box-shadow: 0 6px 24px #0002;
+    }
+    .stat-icon {
+        font-size: 2.7rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+    }
+    .stat-title {
+        font-size: 1.1rem;
+        color: #888;
+        margin-bottom: 0.2rem;
+    }
+    .stat-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+    }
+    .export-btn {
+        font-size: 1.1rem;
+        border-radius: 2rem;
+        padding: 0.6rem 2.2rem;
+        margin-bottom: 1.5rem;
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+    }
+    .filter-form {
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px #0001;
+        padding: 1.5rem 1rem 0.5rem 1rem;
+        margin-bottom: 2rem;
+        max-width: 900px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .filter-form .form-label {
+        font-weight: 500;
+        margin-bottom: 0.4rem;
+    }
+    .filter-form .form-select {
+        min-width: 160px;
+        text-align: right;
+    }
+    .filter-form .btn-primary {
+        font-size: 1.15rem;
+        padding: 0.6rem 2.5rem;
+        border-radius: 2rem;
+        font-weight: bold;
+    }
+    .report-title {
+        font-size: 2.3rem;
+        font-weight: bold;
+        color: #0d6efd;
+        margin-bottom: 0.3rem;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 8px #0001;
+        border-bottom: 2px solid #e3eafc;
+        display: inline-block;
+        padding-bottom: 0.2rem;
+    }
+    .report-desc {
+        font-size: 1.08rem;
+        color: #888;
+        margin-bottom: 1.2rem;
+        margin-top: 0.1rem;
+    }
+    @media (min-width: 768px) {
+        .filter-form .row {
+            flex-wrap: nowrap;
+        }
+        .filter-form .col-md-4, .filter-form .col-md-2 {
+            flex: 1 1 0;
+            max-width: 33%;
+        }
+        .filter-form .col-md-2 {
+            max-width: 20%;
+        }
+    }
+</style>
+<div class="text-center mb-4">
+    <div class="mb-2">
+        <span class="report-title">التقارير والإحصائيات</span>
+    </div>
+    <div class="report-desc">يمكنك هنا استعراض أهم الإحصائيات والتقارير، مع إمكانية التصفية والتصدير.</div>
+    <form method="get" class="row filter-form justify-content-center align-items-end g-3">
+        <div class="col-md-4 mb-2 mb-md-0">
+            <label class="form-label">تصفية حسب المرحلة التعليمية:</label>
+            <select name="stage" class="form-select">
+                <option value="">كل المراحل</option>
+                {% for s in all_stages %}
+                    <option value="{{ s }}" {% if s == stage_filter %}selected{% endif %}>{{ s|default:'غير محدد' }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4 mb-2 mb-md-0">
+            <label class="form-label">تصفية حسب المادة:</label>
+            <select name="subject" class="form-select">
+                <option value="">كل المواد</option>
+                {% for sub in all_subjects %}
+                    <option value="{{ sub }}" {% if sub == subject_filter %}selected{% endif %}>{{ sub|default:'غير محدد' }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2 d-grid">
+            <button type="submit" class="btn btn-primary">تصفية</button>
+        </div>
+    </form>
+    <a href="{% url 'export_report_excel' %}?stage={{ stage_filter }}&subject={{ subject_filter }}" class="btn btn-outline-success export-btn">تصدير Excel</a>
+    <a href="{% url 'export_report_pdf' %}?stage={{ stage_filter }}&subject={{ subject_filter }}" class="btn btn-outline-danger export-btn">تصدير PDF</a>
+</div>
+<div class="row justify-content-center mb-4 g-4">
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-primary bg-opacity-10">
+            <span class="stat-icon text-primary">📋</span>
+            <div class="stat-title">عدد البرامج التدريبية</div>
+            <div class="stat-value text-primary">{{ total_programs }}</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-success bg-opacity-10">
+            <span class="stat-icon text-success">👨‍🎓</span>
+            <div class="stat-title">عدد المتدربين</div>
+            <div class="stat-value text-success">{{ total_trainees }}</div>
+        </div>
+    </div>
+    <div class="col-lg-4 col-md-6 col-12">
+        <div class="card stat-card text-center p-4 bg-info bg-opacity-10">
+            <span class="stat-icon text-info">🏫</span>
+            <div class="stat-title">عدد البرامج لكل مرحلة</div>
+            <ul class="list-unstyled mb-0">
+                {% for item in programs_per_stage %}
+                    <li>{{ item.stage|default:'غير محدد' }}: <b>{{ item.count }}</b></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %} 
