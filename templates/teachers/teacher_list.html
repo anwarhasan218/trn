@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}قائمة المعلمين{% endblock %}
+{% block content %}
+<a href="{% url 'teacher_add' %}" class="btn btn-success mb-3">إضافة معلم جديد</a>
+<a href="{% url 'download_teacher_template' %}" class="btn btn-outline-info mb-3 ms-2">تنزيل نموذج Excel فارغ</a>
+<a href="{% url 'teacher_import' %}" class="btn btn-outline-secondary mb-3 ms-2">استيراد من Excel</a>
+<a href="{% url 'delete_all_teachers' %}" class="btn btn-danger mb-3 ms-2" onclick="return confirm('هل أنت متأكد أنك تريد حذف جميع المعلمين؟ هذا الإجراء لا يمكن التراجع عنه!');">حذف جميع المعلمين</a>
+<form method="get" class="row g-2 align-items-end mb-3">
+    <div class="col-md-3">
+        <label class="form-label">بحث بالاسم أو الرقم القومي أو السجل:</label>
+        <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="بحث...">
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">تصفية حسب المادة:</label>
+        <select name="subject" class="form-select">
+            <option value="">كل المواد</option>
+            {% for s in subjects %}
+                <option value="{{ s }}" {% if s == subject_filter %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label class="form-label">تصفية حسب الدرجة الوظيفية:</label>
+        <select name="job_grade" class="form-select">
+            <option value="">كل الدرجات</option>
+            {% for g in job_grades %}
+                <option value="{{ g }}" {% if g == job_grade_filter %}selected{% endif %}>{{ g }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="col-md-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">بحث/تصفية</button>
+        <a href="{% url 'teacher_list' %}" class="btn btn-outline-secondary">إعادة تعيين</a>
+    </div>
+</form>
+<div class="table-responsive">
+    <table class="table table-bordered table-striped text-center align-middle">
+        <thead class="table-primary">
+            <tr>
+                <th>الاسم</th>
+                <th>الرقم القومي</th>
+                <th>رقم السجل</th>
+                <th>المادة</th>
+                <th>المرحلة التعليمية</th>
+                <th>المنطقة</th>
+                <th>الإدارة</th>
+                <th>المعهد</th>
+                <th>الدرجة الوظيفية</th>
+                <th>إجراءات</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for teacher in teachers %}
+            <tr>
+                <td>{{ teacher.name }}</td>
+                <td>{{ teacher.national_id }}</td>
+                <td>{{ teacher.record_number }}</td>
+                <td>{{ teacher.subject }}</td>
+                <td>{{ teacher.stage }}</td>
+                <td>{{ teacher.region }}</td>
+                <td>{{ teacher.administration }}</td>
+                <td>{{ teacher.institute }}</td>
+                <td>{{ teacher.job_grade }}</td>
+                <td>
+                    <a href="{% url 'teacher_edit' teacher.pk %}" class="btn btn-warning btn-sm">تعديل</a>
+                    <a href="{% url 'teacher_delete' teacher.pk %}" class="btn btn-danger btn-sm">حذف</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="10">لا يوجد معلمين مسجلين.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %} 
