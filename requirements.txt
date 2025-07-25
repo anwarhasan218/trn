@@ -1,3 +1,5 @@
-Django>=3.2
-gunicorn
+Django>=3.2,<5.0
+pillow
 whitenoise
+openpyxl
+reportlab
